@@ -21,13 +21,13 @@ export interface IOrderForm {
 }
 
 // Контактные данные
-export interface IOrderInfo {
+export interface IOrderContacts {
 	email: string;
 	phone: string;
 }
 
 // Интерфейс заказа
-export interface IOrder extends IOrderInfo, IOrderForm {
+export interface IOrder extends IOrderContacts, IOrderForm {
 	total: number;
 	items: string[];
 }

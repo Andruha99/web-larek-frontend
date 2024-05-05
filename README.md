@@ -153,18 +153,6 @@ export interface IAppData {
 
 - `emitChanges` - сообщает всем что модель поменялась
 
-#### Класс LarekApi
-
-Класс LarekApi расширяет класс Api.\
-Предназначен для взаимодействия с api веб-ларька\
-В конструктор передается: URL-адрес контента (`cdn: string`); базовый URL-адрес (`baseUrl: string`); объект с опциями (`options?: RequestInit`), по умолчанию - пустой объект.
-
-Методы:
-
-- `getProductList(): Promise<IProductItem[]>` - получить список товаров с сервера
-- `getProductItem(id: string): Promise<IProductItem>` - получить экземпляр товара. В качестве параметра принимает `id` товара.
-- `orderProduct(order: IOrder): Promise<IOrderResult>` - оформить заказ товара. В качестве параметра принимает `order` - форму заказа товара(-ов).
-
 ### Слой представления
 
 #### Класс Component
@@ -198,3 +186,49 @@ export interface IAppData {
 
 Используется для отображения успешного оформления заказа. Расширяет класс Component.\
 Конструктор принимает: DOM-элемент модального окна успешного заказа(`container: HTMLElement`), события (`actions: ISuccessActions`), итоговую сумму (`total: number`).
+
+#### Класс Form
+
+Используется для создания и отображения форм. Расширяет класс Component.\
+Конструктор принимает: DOM-элемент формы(`protected container: HTMLFormElement`), события (`protected events: IEvents`).
+
+Методы:
+
+- `protected onInputChange(field: keyof T, value: string)` - событие изменения поля формы
+- `set valid(value: boolean)` - сеттер для установки валидности формы
+- `set errors(value: string)` - сеттер для установки текста ошибки поля
+- `render(state: Partial<T> & IFormState)` - вывод формы на экран
+
+#### Класс AddressForm
+
+Используется для формы с выбором вида платежа и указанием адреса доставки. Расширяет класс Form.\
+Конструктор принимает: DOM-элемент формы контактных данных (`container: HTMLFormElement`), события (`protected events: IEvents`).
+
+Методы:
+
+- `set selected(name: string)` - устанавливает значение вида платежа
+- `set address(value: string)` - сеттер для установки адреса доставки
+
+#### Класс ContactForm
+
+Используется для формы контакты. Расширяет класс Form.\
+Конструктор принимает: DOM-элемент формы контактных данных (`container: HTMLFormElement`), события (`protected events: IEvents`).
+
+Методы:
+
+- `set email(value: string)` - сеттер для установки email
+- `set phone(value: string)` - сеттер для установки телефона
+
+### Слой коммуникации
+
+#### Класс LarekApi
+
+Класс LarekApi расширяет класс Api.\
+Предназначен для взаимодействия с api веб-ларька\
+В конструктор передается: URL-адрес контента (`cdn: string`); базовый URL-адрес (`baseUrl: string`); объект с опциями (`options?: RequestInit`), по умолчанию - пустой объект.
+
+Методы:
+
+- `getProductList(): Promise<IProductItem[]>` - получить список товаров с сервера
+- `getProductItem(id: string): Promise<IProductItem>` - получить экземпляр товара. В качестве параметра принимает `id` товара.
+- `orderProduct(order: IOrder): Promise<IOrderResult>` - оформить заказ товара. В качестве параметра принимает `order` - форму заказа товара(-ов).
