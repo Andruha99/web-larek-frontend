@@ -121,7 +121,7 @@ export interface IAppData {
 #### Класс Api
 
 Содержит в себе базовую логику отправки запросов.\
-В конструктор передается базовый адрес (baseUrl) сервера и объект с опциями(options), в котором находятся заголовки запросов(по умолчанию пустой объект).
+В конструктор передается базовый адрес (`baseUrl: string`) сервера и объект с опциями(`options: RequestInit`), в котором находятся заголовки запросов(по умолчанию пустой объект).
 
 Методы:
 
@@ -147,7 +147,7 @@ export interface IAppData {
 #### Класс Model
 
 Абстрактный класс, для управления данными.\
-В конструктор передается объект с начальными данными для модели (data) и объект для управления событиями (events)
+В конструктор передается объект с начальными данными для модели (`data: Partial<T>`) и объект для управления событиями (`protected events: IEvents`)
 
 Метод:
 
@@ -157,10 +157,44 @@ export interface IAppData {
 
 Класс LarekApi расширяет класс Api.\
 Предназначен для взаимодействия с api веб-ларька\
-В конструктор передается: URL-адрес контента (cdn); базовый URL-адрес (baseUrl); объект с опциями (options), по умолчанию - пустой объект.
+В конструктор передается: URL-адрес контента (`cdn: string`); базовый URL-адрес (`baseUrl: string`); объект с опциями (`options?: RequestInit`), по умолчанию - пустой объект.
 
 Методы:
 
 - `getProductList(): Promise<IProductItem[]>` - получить список товаров с сервера
 - `getProductItem(id: string): Promise<IProductItem>` - получить экземпляр товара. В качестве параметра принимает `id` товара.
 - `orderProduct(order: IOrder): Promise<IOrderResult>` - оформить заказ товара. В качестве параметра принимает `order` - форму заказа товара(-ов).
+
+### Слой представления
+
+#### Класс Component
+
+Абстрактный класс для всех компонентов. Предназначен для работы с DOM.\
+В конструкторе принимает DOM-элемент (`protected readonly container: HTMLElement`).
+
+Методы:
+
+- `toggleClass(element: HTMLElement, className: string, force?: boolean)` - переключить класс
+- `protected setText(element: HTMLElement, value: unknown)` - установить текстовое содержимое
+- `setDisabled(element: HTMLElement, state: boolean)` - сменить статус блокировки
+- `protected setHidden(element: HTMLElement)` - скрыть
+- `protected setVisible(element: HTMLElement)` - показать
+- `protected setImage(element: HTMLImageElement, src: string, alt?: string)` - установить изображение с алтернативным текстом
+- `render(data?: Partial<T>): HTMLElement` - вернуть корневой DOM-элемент
+
+#### Класс Modal
+
+Позволяет управлять модальными окнами. Modal расширяет класс Component.\
+Конструктор принимает: DOM-элемент модального окна (`container: HTMLElement`) и события (`protected events: IEvents`).
+
+Методы:
+
+- `set content(value: HTMLElement)` - сеттер для установки содержимого модального окна
+- `open()` - открыть модальное окно
+- `close()` - закрыть модальное окно
+- `render(data: IModalData): HTMLElement` - вывод модального окна на экран
+
+#### Класс Success
+
+Используется для отображения успешного оформления заказа. Расширяет класс Component.\
+Конструктор принимает: DOM-элемент модального окна успешного заказа(`container: HTMLElement`), события (`actions: ISuccessActions`), итоговую сумму (`total: number`).
