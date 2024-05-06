@@ -8,6 +8,7 @@ import { EventEmitter } from './components/base/events';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
+import { IProductItem } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, ensureElement } from './utils/utils';
 
@@ -40,13 +41,12 @@ api
 	.then((productList) => appData.setCatalog(productList))
 	.catch((err) => console.error(err));
 
+// отображение списка карточек
 events.on<CatalogChangeEvent>('items:changed', () => {
 	page.catalog = appData.catalog.map((item) => {
 		const card = new Card(cloneTemplate(cardCatalogTemplate), {
 			onClick: () => events.emit('card:select', item),
 		});
-
-		console.log(item.price);
 
 		return card.render({
 			category: item.category,
@@ -55,4 +55,36 @@ events.on<CatalogChangeEvent>('items:changed', () => {
 			price: item.price,
 		});
 	});
+});
+
+// отображение полной информации о товаре
+events.on('card:select', (item: IProductItem) => {
+	appData.setPreview(item);
+});
+
+// изменен открытый товар
+events.on('preview:changed', (item: IProductItem) => {
+	const showItem = (item: IProductItem) => {
+		const cardPreview = new Card(cloneTemplate(cardPreviewTemplate), {
+			onClick: () => {},
+		});
+
+		modal.render({
+			content: cardPreview.render({
+				image: item.image,
+				category: item.category,
+				title: item.title,
+				description: item.description,
+			}),
+		});
+	};
+
+	if (item) {
+		api.getProductItem(item.id).then((result) => {
+			item.description = result.description;
+			showItem(item);
+		});
+	} else {
+		modal.close();
+	}
 });
