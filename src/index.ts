@@ -10,7 +10,7 @@ import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
 import { IProductItem } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
-import { cloneTemplate, ensureElement } from './utils/utils';
+import { cloneTemplate, createElement, ensureElement } from './utils/utils';
 
 const events = new EventEmitter();
 const api = new LarekApi(CDN_URL, API_URL);
@@ -62,12 +62,25 @@ events.on('card:select', (item: IProductItem) => {
 	appData.setPreview(item);
 });
 
-// изменен открытый товар
+// Превью товара
 events.on('preview:changed', (item: IProductItem) => {
 	const showItem = (item: IProductItem) => {
 		const cardPreview = new Card(cloneTemplate(cardPreviewTemplate), {
-			onClick: () => {},
+			onClick: () => {
+				appData.addToBasket(item);
+				modal.close();
+			},
 		});
+
+		const productInBasket = appData.basket.findIndex(
+			(product) => product.id === item.id
+		);
+
+		if (productInBasket !== -1) {
+			cardPreview.buyButton = true;
+		} else {
+			cardPreview.buyButton = false;
+		}
 
 		modal.render({
 			content: cardPreview.render({
@@ -75,6 +88,7 @@ events.on('preview:changed', (item: IProductItem) => {
 				category: item.category,
 				title: item.title,
 				description: item.description,
+				price: item.price,
 			}),
 		});
 	};
@@ -87,4 +101,79 @@ events.on('preview:changed', (item: IProductItem) => {
 	} else {
 		modal.close();
 	}
+});
+
+// Блокируем прокрутку страницы если открыта модалка
+events.on('modal:open', () => {
+	page.locked = true;
+});
+
+// ... и разблокируем
+events.on('modal:close', () => {
+	page.locked = false;
+});
+
+// Открыть корзину
+events.on('basket:open', () => {
+	modal.render({
+		content: createElement<HTMLElement>('div', {}, [basket.render()]),
+	});
+});
+
+// Отрисовка продукта в корзине
+events.on('basket:changed', () => {
+	const basketItems = appData.basket.map((item) => {
+		const basketCard = new Card(cloneTemplate(cardBasketTemplate), {
+			onClick: () => events.emit('basket:remove', item),
+		});
+
+		return basketCard.render({
+			price: item.price,
+			title: item.title,
+			id: item.id,
+		});
+	});
+
+	basket.render({
+		items: basketItems,
+		total: appData.getTotalSum(),
+	});
+
+	basket.selected = basketItems;
+});
+
+// Удаление из корзины
+events.on('basket:remove', (item: IProductItem) => {
+	appData.removeFromBasket(item.id);
+	events.emit('basket:changed');
+	events.emit('counter:changed');
+});
+
+// Количество товаров в корзине
+events.on('counter:changed', () => {
+	page.counter = appData.totalAmountOfProducts();
+});
+
+// Открыть форму заказа
+events.on('order:open', () => {
+	modal.render({
+		content: order.render({
+			payment: '',
+			address: '',
+			valid: false,
+			errors: [],
+		}),
+	});
+});
+
+// Открыть форму контактов
+events.on('order:open', () => {
+	modal.render({
+		content: contacts.render({
+			email: '',
+			phone: '',
+			valid: false,
+			errors: [],
+		}),
+	});
 });

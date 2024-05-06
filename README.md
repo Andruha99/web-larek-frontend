@@ -164,6 +164,8 @@ export interface IAppData {
 - `getTotalSum(): number` - возвращает общую стоимость товаров в корзине
 - `addToBasket(item: ProductItem)` - добавляет товар в корзину
 - `removeFromBasket(id: string)` - удаляет товар из корзины
+- `cleanBasket()` - очищает корзину от всех товаров
+- `totalAmountOfProducts()` - общее количество товаров в корзине
 - `setOrderField(field: keyof IOrderForm, value: string)` - устанавливает поля формы заказа
 - `setContactsField(field: keyof IOrderContacts, value: string)` - устанавливает поля формы контактов
 - `validateOrder()` - валидация формы заказа

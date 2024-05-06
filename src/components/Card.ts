@@ -76,7 +76,7 @@ export class Card extends Component<IProductItem> {
 	set price(value: number | null) {
 		if (!value) {
 			this.setText(this._price, 'Бесценно');
-			// this._button.disabled = true;
+			this.setDisabled(this._button, true);
 		} else {
 			this.setText(this._price, `${value} синапсов`);
 		}
@@ -89,10 +89,11 @@ export class Card extends Component<IProductItem> {
 	set buyButton(value: boolean) {
 		if (this._button) {
 			if (value) {
-				this._button.setAttribute('disabled', 'disabled');
 				this._button.disabled = true;
+				this.setText(this._button, 'Товар уже добавлен');
 			} else {
 				this._button.disabled = false;
+				this.setText(this._button, 'В корзину');
 			}
 		}
 	}

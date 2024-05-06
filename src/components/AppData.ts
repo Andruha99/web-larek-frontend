@@ -23,7 +23,7 @@ export class ProductItem extends Model<IProductItem> {
 }
 
 export class AppState extends Model<IAppData> {
-	basket: IBasketItem[];
+	basket: IBasketItem[] = [];
 	catalog: IProductItem[];
 	order: IOrder = {
 		payment: 'card',
@@ -52,7 +52,7 @@ export class AppState extends Model<IAppData> {
 		return this.basket.reduce((acc, item) => acc + item.price, 0);
 	}
 
-	addToBasket(item: ProductItem) {
+	addToBasket(item: IProductItem) {
 		this.basket.push({
 			id: item.id,
 			index: this.basket.length + 1,
@@ -60,10 +60,22 @@ export class AppState extends Model<IAppData> {
 			price: item.price,
 		});
 		this.emitChanges('basket:changed');
+		this.emitChanges('counter:changed');
 	}
 
 	removeFromBasket(id: string) {
 		this.basket = this.basket.filter((item) => item.id !== id);
+		this.emitChanges('basket:changed');
+	}
+
+	cleanBasket() {
+		this.basket = [];
+		this.emitChanges('basket:changed');
+		this.emitChanges('counter:changed');
+	}
+
+	totalAmountOfProducts() {
+		return this.basket.length;
 	}
 
 	setOrderField(field: keyof IOrderForm, value: string) {
