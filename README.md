@@ -71,15 +71,15 @@ export interface IOrderForm {
 }
 
 // Контактные данные
-export interface IOrderInfo {
+export interface IOrderContacts {
 	email: string;
 	phone: string;
 }
 
 // Интерфейс заказа
-export interface IOrder extends IOrderInfo, IOrderForm {
-	items: string[];
+export interface IOrder extends IOrderContacts, IOrderForm {
 	total: number;
+	items: string[];
 }
 
 // Интерфейс успешного заказа
@@ -153,6 +153,22 @@ export interface IAppData {
 
 - `emitChanges` - сообщает всем что модель поменялась
 
+#### Класс AppState
+
+Класс предназначен для хранения состояния приложения. Расширяет класс Model.\
+
+Методы:
+
+- `setCatalog(items: IProductItem[])` - устанавливает каталог товаров
+- `setPreview(item: IProductItem)` - устанавливает превью товара
+- `getTotalSum(): number` - возвращает общую стоимость товаров в корзине
+- `addToBasket(item: ProductItem)` - добавляет товар в корзину
+- `removeFromBasket(id: string)` - удаляет товар из корзины
+- `setOrderField(field: keyof IOrderForm, value: string)` - устанавливает поля формы заказа
+- `setContactsField(field: keyof IOrderContacts, value: string)` - устанавливает поля формы контактов
+- `validateOrder()` - валидация формы заказа
+- `validateContacts()` - валидация формы контактов
+
 ### Слой представления
 
 #### Класс Component
@@ -218,6 +234,47 @@ export interface IAppData {
 
 - `set email(value: string)` - сеттер для установки email
 - `set phone(value: string)` - сеттер для установки телефона
+
+#### Класс Card
+
+Используется для создания карточек товара на главной странице, в корзине, в модальном окне просмотра.\
+Конструктор принимает контейнер карточки товара (`container: HTMLElement`), необязательный объект с событиями (`actions?: ICardActions`)
+
+Методы:
+
+- `set id(value: string)` - устанавливает id
+- `get id(): string` - получает id
+- `set title(value: string)` - устанавливает название карточки
+- `get title(): string` - получает название карточки
+- `set image(value: string)` - устанавливает картинку товара
+- `set description(value: string)` - устанавливает описание товара
+- `set category(value: string)` - устанавливает категорию товара
+- `get category(): string` - получает категорию товара
+- `set price(value: number | null)` - устанавливает цену товара
+- `get price(): string` - получает цену товара
+- `set buyButton(value: boolean)` - устанавливает активность кнопки купить, в зависимости от наличия товара в корзине
+
+#### Класс Basket
+
+Предназначен для работы с корзиной. Расширяет класс Component.\
+Конструктор принимает: DOM-элемент корзины (`container: HTMLElement`) и объект с событиями (`protected events: EventEmitter`).
+
+Методы:
+
+- `set items(items: HTMLElement[])` - устанавливает список товаров в корзине и индекс каждого товара
+- `set selected(items: string[])` - устанавливает активность кнопки оформления заказа, в зависимости от наличия товаров в корзине
+- `set total(total: number)` - устанавливает итоговую стоимость для оформления заказа
+
+#### Класс Page
+
+Предназначен для работы с главной страницей. Расширяет класс Component.\
+Контейнер принимает: DOM-элемент контейнер (`container: HTMLElement`) и объект с событиями (`protected events: IEvents`).
+
+Методы:
+
+- `set counter(value: number)` - устанавливает значение количества товаров в корзине
+- `set catalog(items: HTMLElement[])` - устанавливает список товаров
+- `set locked(value: boolean)` - блокирует/разблокирует скролл при открытии/закрытии модального окна
 
 ### Слой коммуникации
 

@@ -1,10 +1,10 @@
 // интерфейс одного товара
 export interface IProductItem {
 	id: string;
-	description: string;
-	image: string;
+	description?: string;
+	image?: string;
 	title: string;
-	category: string;
+	category?: string;
 	price: number | null;
 }
 
@@ -16,7 +16,7 @@ export interface IProductList {
 
 // Оформление доставки
 export interface IOrderForm {
-	payment: 'card' | 'cash';
+	payment: string;
 	address: string;
 }
 
@@ -39,7 +39,7 @@ export interface IOrderResult {
 }
 
 // Данные об одном товаре в корзине
-export type IBasketItem = Pick<IProductItem, 'title' | 'price'> & {
+export type IBasketItem = Pick<IProductItem, 'title' | 'price' | 'id'> & {
 	// Порядковый номер в корзине
 	index: number;
 };
@@ -56,3 +56,5 @@ export interface IAppData {
 	catalog: IProductItem[];
 	order: IOrder | null;
 }
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;

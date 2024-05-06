@@ -74,9 +74,9 @@ export class Card extends Component<IProductItem> {
 	}
 
 	set price(value: number | null) {
-		if (value) {
+		if (!value) {
 			this.setText(this._price, 'Бесценно');
-			this._button.disabled = true;
+			// this._button.disabled = true;
 		} else {
 			this.setText(this._price, `${value} синапсов`);
 		}
