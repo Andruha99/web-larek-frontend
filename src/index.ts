@@ -198,8 +198,8 @@ events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
 events.on('order:submit', () => {
 	modal.render({
 		content: contacts.render({
-			email: '',
-			phone: '',
+			email: '' || appData.order.email,
+			phone: '' || appData.order.phone,
 			valid: true,
 			errors: [],
 		}),
@@ -210,7 +210,6 @@ events.on('order:submit', () => {
 // Изменилось состояние валидации формы контактов
 events.on('formErrors:change', (errors: Partial<IOrderContacts>) => {
 	const { email, phone } = errors;
-	console.log();
 	contacts.valid = !email && !phone;
 	contacts.errors = Object.values({ phone, email })
 		.filter((i) => !!i)
@@ -222,27 +221,30 @@ events.on(
 	/^contacts\..*:change/,
 	(data: { field: keyof IOrderContacts; value: string }) => {
 		appData.setContactsField(data.field, data.value);
-		appData.validateOrder();
+		appData.validateContacts();
 	}
 );
 
 // Отправлена форма заказа
 events.on('contacts:submit', () => {
-	api.orderProduct(appData.order).then((result) => {
-		const success = new Success(
-			cloneTemplate(successModalTemplate),
-			{
-				onClick: () => {
-					modal.close();
-					appData.cleanBasket();
-					page.counter = 0;
+	api
+		.orderProduct(appData.order)
+		.then(() => {
+			const success = new Success(
+				cloneTemplate(successModalTemplate),
+				{
+					onClick: () => {
+						modal.close();
+						appData.cleanBasket();
+						page.counter = 0;
+					},
 				},
-			},
-			appData.order.total
-		);
+				appData.order.total
+			);
 
-		modal.render({
-			content: success.render(),
-		});
-	});
+			modal.render({
+				content: success.render(),
+			});
+		})
+		.catch((err) => console.error(err));
 });

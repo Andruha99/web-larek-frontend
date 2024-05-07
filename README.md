@@ -51,10 +51,10 @@ yarn build
 // интерфейс одного товара
 export interface IProductItem {
 	id: string;
-	description: string;
-	image: string;
+	description?: string;
+	image?: string;
 	title: string;
-	category: string;
+	category?: string;
 	price: number | null;
 }
 
@@ -66,7 +66,7 @@ export interface IProductList {
 
 // Оформление доставки
 export interface IOrderForm {
-	payment: 'card' | 'cash';
+	payment: string;
 	address: string;
 }
 
@@ -89,7 +89,7 @@ export interface IOrderResult {
 }
 
 // Данные об одном товаре в корзине
-export type IBasketItem = Pick<IProductItem, 'title' | 'price'> & {
+export type IBasketItem = Pick<IProductItem, 'title' | 'price' | 'id'> & {
 	// Порядковый номер в корзине
 	index: number;
 };
@@ -106,6 +106,9 @@ export interface IAppData {
 	catalog: IProductItem[];
 	order: IOrder | null;
 }
+
+export type FormErrors = Partial<Record<keyof IOrder, string>>;
+
 ```
 
 ## Архитектура приложения
@@ -263,9 +266,9 @@ export interface IAppData {
 
 Методы:
 
-- `set items(items: HTMLElement[])` - устанавливает список товаров в корзине и индекс каждого товара
+- `set items(items: HTMLElement[])` - устанавливает список товаров в корзине и индекс каждого товара в ней
 - `set selected(items: string[])` - устанавливает активность кнопки оформления заказа, в зависимости от наличия товаров в корзине
-- `set total(total: number)` - устанавливает итоговую стоимость для оформления заказа
+- `set total(total: number)` - устанавливает текст для отображения цены в корзине
 
 #### Класс Page
 
