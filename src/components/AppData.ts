@@ -89,6 +89,7 @@ export class AppState extends Model<IAppData> {
 
 	setContactsField(field: keyof IOrderContacts, value: string) {
 		this.order[field] = value;
+		console.log(this.order);
 
 		if (this.validateOrder()) {
 			this.events.emit('contacts:ready', this.order);
@@ -97,6 +98,9 @@ export class AppState extends Model<IAppData> {
 
 	validateOrder() {
 		const errors: typeof this.formErrors = {};
+		if (!this.order.payment) {
+			errors.address = 'Необходимо указать вид оплаты';
+		}
 		if (!this.order.address) {
 			errors.address = 'Необходимо указать адрес';
 		}

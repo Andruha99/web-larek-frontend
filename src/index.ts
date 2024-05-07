@@ -7,6 +7,7 @@ import { Page } from './components/Page';
 import { EventEmitter } from './components/base/events';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
+import { Success } from './components/common/Success';
 import './scss/styles.scss';
 import { IOrderContacts, IOrderForm, IProductItem } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
@@ -156,7 +157,6 @@ events.on('counter:changed', () => {
 
 // Открыть форму заказа
 events.on('order:open', () => {
-	appData.validateOrder();
 	modal.render({
 		content: order.render({
 			payment: '',
@@ -165,6 +165,15 @@ events.on('order:open', () => {
 			errors: [],
 		}),
 	});
+	appData.validateOrder();
+
+	appData.order.items = appData.basket.map((item) => item.id);
+	appData.order.total = appData.getTotalSum();
+});
+
+// изменения способа оплаты
+events.on('payment:change', (item: HTMLButtonElement) => {
+	appData.order.payment = item.name;
 	appData.validateOrder();
 });
 
@@ -195,14 +204,45 @@ events.on('order:submit', () => {
 			errors: [],
 		}),
 	});
-	console.log(order);
+	appData.validateContacts();
 });
 
 // Изменилось состояние валидации формы контактов
 events.on('formErrors:change', (errors: Partial<IOrderContacts>) => {
 	const { email, phone } = errors;
+	console.log();
 	contacts.valid = !email && !phone;
 	contacts.errors = Object.values({ phone, email })
 		.filter((i) => !!i)
 		.join('; ');
+});
+
+// Изменилось одно из полей формы контактов
+events.on(
+	/^contacts\..*:change/,
+	(data: { field: keyof IOrderContacts; value: string }) => {
+		appData.setContactsField(data.field, data.value);
+		appData.validateOrder();
+	}
+);
+
+// Отправлена форма заказа
+events.on('contacts:submit', () => {
+	api.orderProduct(appData.order).then((result) => {
+		const success = new Success(
+			cloneTemplate(successModalTemplate),
+			{
+				onClick: () => {
+					modal.close();
+					appData.cleanBasket();
+					page.counter = 0;
+				},
+			},
+			appData.order.total
+		);
+
+		modal.render({
+			content: success.render(),
+		});
+	});
 });
