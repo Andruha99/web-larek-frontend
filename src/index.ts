@@ -8,7 +8,7 @@ import { EventEmitter } from './components/base/events';
 import { Basket } from './components/common/Basket';
 import { Modal } from './components/common/Modal';
 import './scss/styles.scss';
-import { IProductItem } from './types';
+import { IOrderContacts, IOrderForm, IProductItem } from './types';
 import { API_URL, CDN_URL } from './utils/constants';
 import { cloneTemplate, createElement, ensureElement } from './utils/utils';
 
@@ -156,24 +156,53 @@ events.on('counter:changed', () => {
 
 // Открыть форму заказа
 events.on('order:open', () => {
+	appData.validateOrder();
 	modal.render({
 		content: order.render({
 			payment: '',
-			address: '',
+			address: '' || appData.order.address,
 			valid: false,
 			errors: [],
 		}),
 	});
+	appData.validateOrder();
+});
+
+// Изменилось одно из полей
+events.on(
+	/^order\..*:change/,
+	(data: { field: keyof IOrderForm; value: string }) => {
+		appData.setOrderField(data.field, data.value);
+		appData.validateOrder();
+	}
+);
+
+events.on('formErrors:change', (errors: Partial<IOrderForm>) => {
+	const { payment, address } = errors;
+	order.valid = !payment && !address;
+	order.errors = Object.values({ payment, address })
+		.filter((i) => !!i)
+		.join('; ');
 });
 
 // Открыть форму контактов
-events.on('order:open', () => {
+events.on('order:submit', () => {
 	modal.render({
 		content: contacts.render({
 			email: '',
 			phone: '',
-			valid: false,
+			valid: true,
 			errors: [],
 		}),
 	});
+	console.log(order);
+});
+
+// Изменилось состояние валидации формы контактов
+events.on('formErrors:change', (errors: Partial<IOrderContacts>) => {
+	const { email, phone } = errors;
+	contacts.valid = !email && !phone;
+	contacts.errors = Object.values({ phone, email })
+		.filter((i) => !!i)
+		.join('; ');
 });

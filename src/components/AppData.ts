@@ -26,7 +26,7 @@ export class AppState extends Model<IAppData> {
 	basket: IBasketItem[] = [];
 	catalog: IProductItem[];
 	order: IOrder = {
-		payment: 'card',
+		payment: '',
 		address: '',
 		email: '',
 		phone: '',
@@ -80,6 +80,7 @@ export class AppState extends Model<IAppData> {
 
 	setOrderField(field: keyof IOrderForm, value: string) {
 		this.order[field] = value;
+		console.log(this.order);
 
 		if (this.validateOrder()) {
 			this.events.emit('order:ready', this.order);
@@ -90,7 +91,7 @@ export class AppState extends Model<IAppData> {
 		this.order[field] = value;
 
 		if (this.validateOrder()) {
-			this.events.emit('order:ready', this.order);
+			this.events.emit('contacts:ready', this.order);
 		}
 	}
 
