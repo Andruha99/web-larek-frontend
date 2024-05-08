@@ -166,12 +166,9 @@ events.on('order:open', () => {
 		}),
 	});
 	appData.validateOrder();
-
-	appData.order.items = appData.basket.map((item) => item.id);
-	appData.order.total = appData.getTotalSum();
 });
 
-// изменения способа оплаты
+// Изменение способа оплаты
 events.on('payment:change', (item: HTMLButtonElement) => {
 	appData.order.payment = item.name;
 	appData.validateOrder();
@@ -227,6 +224,9 @@ events.on(
 
 // Отправлена форма заказа
 events.on('contacts:submit', () => {
+	appData.order.items = appData.basket.map((item) => item.id);
+	appData.order.total = appData.getTotalSum();
+
 	api
 		.orderProduct(appData.order)
 		.then(() => {
@@ -237,6 +237,15 @@ events.on('contacts:submit', () => {
 						modal.close();
 						appData.cleanBasket();
 						page.counter = 0;
+
+						appData.order = {
+							payment: '',
+							address: '',
+							email: '',
+							phone: '',
+							total: 0,
+							items: [],
+						};
 					},
 				},
 				appData.order.total
